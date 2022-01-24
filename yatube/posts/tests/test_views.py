@@ -147,12 +147,11 @@ class PostPagesTests(TestCase):
                 'slug': PostPagesTests.group.slug}),
             reverse('posts:profile', kwargs={
                 'username': PostPagesTests.user.username})
-    ]
+        ]
         for url in field_urls_templates:
             with self.subTest(url=url):
                 response = self.authorized_client.get(url)
                 self.assertEqual(len(response.context['page_obj']), 1)
-   
 
 
 class PaginatorViewsTest(TestCase):
@@ -194,17 +193,16 @@ class PaginatorViewsTest(TestCase):
                                                self.authorized_client,
                                                pages_names)
 
+
 def get_first_page_contains_ten_records(self, client, page_names):
-        for url in page_names:
-            with self.subTest(url=url):
-                response = client.get(url)
-                self.assertEqual(len(response.context['page_obj']), 10)
+    for url in page_names:
+        with self.subTest(url=url):
+            response = client.get(url)
+            self.assertEqual(len(response.context['page_obj']), 10)
 
 
 def get_second_page_contains_three_records(self, client, page_names):
-        for url in page_names:
-            with self.subTest(url=url):
-                response = client.get(url + '?page=2')
-                self.assertEqual(len(response.context['page_obj']), 3)
-
-   
+    for url in page_names:
+        with self.subTest(url=url):
+            response = client.get(url + '?page=2')
+            self.assertEqual(len(response.context['page_obj']), 3)
