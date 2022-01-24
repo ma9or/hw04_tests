@@ -1,4 +1,3 @@
-
 from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -95,9 +94,9 @@ class PostEditFormTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostEditFormTests.user)
 
-    def test_cant_edit_post_authorized(self):
+    def test_edit_post_authorized(self):
         '''Тестируем редактирования поста авторизованным пользователем'''
-        tasks_count = Post.objects.count()
+        posts_count = Post.objects.count()
         form_data = {
             'group': PostCreateFormTests.group.id,
             'text': 'test',
@@ -108,10 +107,10 @@ class PostEditFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertEqual(Post.objects.count(), tasks_count)
+        self.assertEqual(Post.objects.count(), posts_count)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         modified_post = Post.objects.get(id=PostEditFormTests.post.id)
-        self.assertEquals(modified_post.text, 'test')
+        self.assertEqual(modified_post.text, 'test')
         self.assertRedirects(response,
                              reverse('posts:post_detail',
                                      kwargs={'post_id':

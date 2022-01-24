@@ -139,6 +139,21 @@ class PostPagesTests(TestCase):
         is_edit_context = response.context.get('is_edit')
         self.assertTrue(is_edit_context)
 
+    def test_page_list_is_1(self):
+        """Пост с группой попал на необходимые страницы."""
+        field_urls_templates = [
+            reverse('posts:index'),
+            reverse('posts:group_posts', kwargs={
+                'slug': PostPagesTests.group.slug}),
+            reverse('posts:profile', kwargs={
+                'username': PostPagesTests.user.username})
+    ]
+        for url in field_urls_templates:
+            with self.subTest(url=url):
+                response = self.authorized_client.get(url)
+                self.assertEqual(len(response.context['page_obj']), 1)
+   
+
 
 class PaginatorViewsTest(TestCase):
     @classmethod
@@ -179,31 +194,17 @@ class PaginatorViewsTest(TestCase):
                                                self.authorized_client,
                                                pages_names)
 
-
 def get_first_page_contains_ten_records(self, client, page_names):
-    for url in page_names:
-        with self.subTest(url=url):
-            response = client.get(url)
-            self.assertEqual(len(response.context['page_obj']), 10)
+        for url in page_names:
+            with self.subTest(url=url):
+                response = client.get(url)
+                self.assertEqual(len(response.context['page_obj']), 10)
 
 
 def get_second_page_contains_three_records(self, client, page_names):
-    for url in page_names:
-        with self.subTest(url=url):
-            response = client.get(url + '?page=2')
-            self.assertEqual(len(response.context['page_obj']), 3)
+        for url in page_names:
+            with self.subTest(url=url):
+                response = client.get(url + '?page=2')
+                self.assertEqual(len(response.context['page_obj']), 3)
 
-
-def test_page_list_is_1(self):
-    """Пост с группой попал на необходимые страницы."""
-    field_urls_templates = [
-        reverse('posts:index'),
-        reverse('posts:group_list', kwargs={
-                'slug': PostPagesTests.group.slug}),
-        reverse('posts:profile', kwargs={
-                'username': PostPagesTests.user.username})
-    ]
-    for url in field_urls_templates:
-        with self.subTest(url=url):
-            response = self.authorized_client.get(url)
-            self.assertEqual(len(response.context['Ьpage_obj']), 1)
+   
