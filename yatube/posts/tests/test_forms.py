@@ -37,12 +37,13 @@ class PostCreateFormTests(TestCase):
             'group': PostCreateFormTests.group.id,
             'text': 'Тестовый текст',
         }
-        self.guest_client.post(
+        response = self.guest_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
         self.assertEqual(Post.objects.count(), posts_count)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_create_post_authorized(self):
         """Валидная форма создает запись в Post."""
@@ -68,8 +69,6 @@ class PostCreateFormTests(TestCase):
 
 
 class PostEditFormTests(TestCase):
-
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
