@@ -22,6 +22,10 @@ class PostPagesTests(TestCase):
             text='Текст поста',
             group=cls.group
         )
+        cls.post1 = Post.objects.create(
+            author=cls.user,
+            text='Текст поста',
+            group=cls.group)
 
     def setUp(self):
         self.authorized_client = Client()
@@ -151,7 +155,7 @@ class PostPagesTests(TestCase):
         for url in field_urls_templates:
             with self.subTest(url=url):
                 response = self.authorized_client.get(url)
-                self.assertEqual(len(response.context['page_obj']), 1)
+                self.assertEqual(len(response.context['page_obj']), 2)
 
 
 class PaginatorViewsTest(TestCase):

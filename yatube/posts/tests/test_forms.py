@@ -32,18 +32,17 @@ class PostCreateFormTests(TestCase):
 
     def test_cant_create_post_anonymous(self):
         '''Тестируем запрет записи поста неавторизованным пользователем'''
-        tasks_count = Post.objects.count()
+        posts_count = Post.objects.count()
         form_data = {
             'group': PostCreateFormTests.group.id,
             'text': 'Тестовый текст',
         }
-        response = self.guest_client.post(
+        self.guest_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
-        self.assertEqual(Post.objects.count(), tasks_count)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(Post.objects.count(), posts_count)
 
     def test_create_post_authorized(self):
         """Валидная форма создает запись в Post."""
@@ -70,9 +69,6 @@ class PostCreateFormTests(TestCase):
 
 class PostEditFormTests(TestCase):
 
-    class Meta:
-        model = Post
-        fields = '__all__'
 
     @classmethod
     def setUpClass(cls):
@@ -97,8 +93,13 @@ class PostEditFormTests(TestCase):
     def test_edit_post_authorized(self):
         '''Тестируем редактирования поста авторизованным пользователем'''
         posts_count = Post.objects.count()
+        new_group = Group.objects.create(
+            title='Тестовая группа новая',
+            slug='new-slug',
+            description='Тестовое описание новой группы',
+        )
         form_data = {
-            'group': PostCreateFormTests.group.id,
+            'group': new_group.id,
             'text': 'test',
         }
         response = self.authorized_client.post(
@@ -111,7 +112,15 @@ class PostEditFormTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         modified_post = Post.objects.get(id=PostEditFormTests.post.id)
         self.assertEqual(modified_post.text, 'test')
-        self.assertRedirects(response,
-                             reverse('posts:post_detail',
-                                     kwargs={'post_id':
-                                             PostEditFormTests.post.id}))
+        self.assertEqual(modified_post.group, new_group)
+        self.assertRedirects(
+            response,
+            reverse('posts:post_detail',
+                    kwargs={'post_id': PostEditFormTests.post.id}))
+        self.assertFalse(
+            Post.objects.filter(
+                group=PostCreateFormTests.group,
+                text='test',
+                author=PostCreateFormTests.user
+            ).exists()
+        )
