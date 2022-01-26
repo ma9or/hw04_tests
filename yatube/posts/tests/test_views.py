@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
+from posts.views import NUM_POST, CONST
 from ..models import Group, Post
 
 User = get_user_model()
@@ -68,6 +69,13 @@ class PostPagesTests(TestCase):
         self.assertEqual(posts_text_0, PostPagesTests.post.text)
         self.assertEqual(posts_author_0, PostPagesTests.post.author)
         self.assertEqual(posts_group_0, PostPagesTests.post.group)
+        second_object = response.context['page_obj'][1]
+        posts_text_1 = second_object.text
+        posts_author_1 = second_object.author
+        posts_group_1 = second_object.group
+        self.assertEqual(posts_text_1, PostPagesTests.post.text)
+        self.assertEqual(posts_author_1, PostPagesTests.post.author)
+        self.assertEqual(posts_group_1, PostPagesTests.post.group)
 
     def test_group_posts_page_show_correct_context(self):
         """Шаблон group_posts сформирован с правильным контекстом."""
@@ -82,6 +90,13 @@ class PostPagesTests(TestCase):
         self.assertEqual(posts_text_0, PostPagesTests.post.text)
         self.assertEqual(posts_author_0, PostPagesTests.post.author)
         self.assertEqual(posts_group_0, PostPagesTests.post.group)
+        second_object = response.context['page_obj'][1]
+        posts_text_1 = second_object.text
+        posts_author_1 = second_object.author
+        posts_group_1 = second_object.group
+        self.assertEqual(posts_text_1, PostPagesTests.post.text)
+        self.assertEqual(posts_author_1, PostPagesTests.post.author)
+        self.assertEqual(posts_group_1, PostPagesTests.post.group)
         group_context = response.context['group']
         self.assertEqual(group_context, PostPagesTests.group)
 
@@ -98,6 +113,13 @@ class PostPagesTests(TestCase):
         self.assertEqual(posts_text_0, PostPagesTests.post.text)
         self.assertEqual(posts_author_0, PostPagesTests.post.author)
         self.assertEqual(posts_group_0, PostPagesTests.post.group)
+        second_object = response.context['page_obj'][1]
+        posts_text_1 = second_object.text
+        posts_author_1 = second_object.author
+        posts_group_1 = second_object.group
+        self.assertEqual(posts_text_1, PostPagesTests.post.text)
+        self.assertEqual(posts_author_1, PostPagesTests.post.author)
+        self.assertEqual(posts_group_1, PostPagesTests.post.group)
         author_context = response.context['author']
         self.assertEqual(author_context, PostPagesTests.post.author)
 
@@ -169,7 +191,7 @@ class PaginatorViewsTest(TestCase):
             description='Тестовое описание',
         )
         list_objs = list()
-        for i in range(13):
+        for i in range(NUM_POST + CONST):
             list_objs.append(Post.objects.create(
                 author=cls.user,
                 text=f'Тестовое содержание поста #{i}',
@@ -202,7 +224,7 @@ def get_first_page_contains_ten_records(self, client, page_names):
     for url in page_names:
         with self.subTest(url=url):
             response = client.get(url)
-            self.assertEqual(len(response.context['page_obj']), 10)
+            self.assertEqual(len(response.context['page_obj']), NUM_POST)
 
 
 def get_second_page_contains_three_records(self, client, page_names):

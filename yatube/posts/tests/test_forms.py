@@ -78,6 +78,11 @@ class PostEditFormTests(TestCase):
             slug='test-slug',
             description='Тестовое описание',
         )
+        cls.new_group = Group.objects.create(
+            title='Тестовая группа новая',
+            slug='new-slug',
+            description='Тестовое описание новой группы',
+        )
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовое содержание поста',
@@ -92,13 +97,8 @@ class PostEditFormTests(TestCase):
     def test_edit_post_authorized(self):
         '''Тестируем редактирования поста авторизованным пользователем'''
         posts_count = Post.objects.count()
-        new_group = Group.objects.create(
-            title='Тестовая группа новая',
-            slug='new-slug',
-            description='Тестовое описание новой группы',
-        )
         form_data = {
-            'group': new_group.id,
+            'group': PostEditFormTests.new_group.id,
             'text': 'test',
         }
         response = self.authorized_client.post(
@@ -111,7 +111,7 @@ class PostEditFormTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         modified_post = Post.objects.get(id=PostEditFormTests.post.id)
         self.assertEqual(modified_post.text, 'test')
-        self.assertEqual(modified_post.group, new_group)
+        self.assertEqual(modified_post.group, PostEditFormTests.new_group)
         self.assertRedirects(
             response,
             reverse('posts:post_detail',

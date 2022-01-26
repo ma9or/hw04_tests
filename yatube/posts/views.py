@@ -7,6 +7,7 @@ from .forms import PostForm
 from .models import Post, Group
 
 NUM_POST = 10
+CONST = 3
 
 User = get_user_model()
 
