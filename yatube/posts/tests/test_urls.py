@@ -30,7 +30,7 @@ class PostURLTests(TestCase):
 
     def test_url_exists_at_desired_location(self):
         """Страницы доступны любому и авторизованным пользователям."""
-        url = [
+        urls = [
             reverse('posts:index'),
             reverse('posts:group_posts',
                     kwargs={'slug':
@@ -42,18 +42,18 @@ class PostURLTests(TestCase):
                     kwargs={'post_id':
                             PostURLTests.post.id}),
         ]
-        for url in url:
-            with self.subTest(url=url):
-                response = self.guest_client.get(url)
-                response = self.authorized_client.get(url)
-                self.assertEqual(response.status_code, HTTPStatus.OK)
-        url = [
+        for request_client in (self.guest_client, self.authorized_client):
+            for url in urls:
+                with self.subTest(url=url, request_client=request_client):
+                    response = request_client.get(url)
+                    self.assertEqual(response.status_code, HTTPStatus.OK)
+        urls = [
             reverse('posts:post_edit',
                     kwargs={'post_id':
                             PostURLTests.post.id}),
             reverse('posts:post_create'),
         ]
-        for url in url:
+        for url in urls:
             with self.subTest(url=url):
                 response = self.authorized_client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -75,6 +75,7 @@ class PostURLTests(TestCase):
     def test_unexisting_page(self):
         """Запрос к страница unixisting_page вернет ошибку 404"""
         response = self.guest_client.get('/unexisting_page/')
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         response = self.authorized_client.get('/unexisting_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
